@@ -1,5 +1,12 @@
-let clientes = require("./clientes.json")
+const getMongo = require("./Mongodb.json")
 
+async function getConexiones() {
+    const nameDb = "aerolineaG1y2"
+    const client = await getMongo.getClientnExport(nameDb)
+    const collection = await getMongo.getCollectionExport(client, nameDb)
+    return { collection, client}
+
+}
 
 const clientesGet = () =>{
     return clientes
@@ -9,6 +16,7 @@ const clientesSet = (cliente) =>{
     clientes.push(cliente)
     return clientes
 }
+
 const clientesDelete = (id) =>{
     console.log(clientes)
     clientes = clientes.filter((vuel)=>{
@@ -19,16 +27,19 @@ const clientesDelete = (id) =>{
     return clientes
 }
 
-const clientesgetIdExport = (id) =>{
-
-    let cliente = clientes.find(
+const clientesgetId = async (id) =>{
+    const { collection, client } = await getConexiones()
+    var clienteEncontrado = null
+    await collection.findOne({"_id":id}).then(
 
         (client)=>{
-            return client.id === id
+            clienteEncontrado = client
         }
+
     )
 
-    return cliente
+    await getMongo.closeClientExport(client)
+    return clienteEncontrado
 }
 
 module.exports.clientesgetExport = clientesGet;
